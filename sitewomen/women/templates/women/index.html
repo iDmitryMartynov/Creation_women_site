@@ -3,9 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная страница</title>
+    <title>{{title}}</title>
 </head>
 <body>
-    <h1>Главная страница Димона</h1>
+    <p>{{menu}} </p>
+    <h1>{{title}}</h1>
+
+    <ul>
+        {% for item in posts %}
+        {% if item.is_published %}
+        <li>
+            <h2>{{item.title}}</h2>
+            <p>{{item.content}}</p>
+            {% if not forloop.last %}
+            <hr>
+            {% endif %}
+            
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
 </body>
 </html>
