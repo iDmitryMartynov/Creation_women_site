@@ -22,10 +22,19 @@ data_db = [
 ]
 
 
+cats_db = [
+    {'id': 1, 'name': 'Актрисы'},
+    {'id': 2, 'name': 'Певицы'},
+    {'id': 3, 'name': 'Спортсменки'},
+]
+
+
+
 def index(request):
     return render(request, 'women/index.html', {'title':'Главная страница',
                                                  'menu': menu,
-                                                 'posts': data_db})
+                                                 'posts': data_db,
+                                                 'cat_selected': 0})
 
 
 def about(request):
@@ -46,6 +55,13 @@ def login(request):
 
 def show_post(request, post_id):
     return HttpResponse(f"Отображение статьи с id = {post_id}")
+
+
+def show_category(request, cat_id):
+    return render(request, 'women/index.html', {'title':'Отображение по рубрикам',
+                                                 'menu': menu,
+                                                 'posts': data_db,
+                                                 'cat_selected': cat_id})
 
 
 def page_not_found(request, exception):
