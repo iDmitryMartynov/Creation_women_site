@@ -1,7 +1,7 @@
 from django.http import Http404, HttpResponse, HttpResponseNotFound
-from django.shortcuts import redirect, render
-
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from .models import Women
 
 
 menu = [{'title': "О сайте", 'url_name': 'about'},
@@ -31,9 +31,10 @@ cats_db = [
 
 
 def index(request):
+    posts = Women.objects.filter(is_published=1)
     return render(request, 'women/index.html', {'title':'Главная страница',
                                                  'menu': menu,
-                                                 'posts': data_db,
+                                                 'posts': posts,
                                                  'cat_selected': 0})
 
 
@@ -53,8 +54,13 @@ def login(request):
     return HttpResponse('Авторизация')
 
 
-def show_post(request, post_id):
-    return HttpResponse(f"Отображение статьи с id = {post_id}")
+def show_post(request, post_slug):
+    post = get_object_or_404(Women, slug=post_slug)
+    data = {'title':post.title,
+            'menu': menu,
+            'post': post,
+            'cat_selected': 1}
+    return render(request, 'women/post.html', data)
 
 
 def show_category(request, cat_id):
