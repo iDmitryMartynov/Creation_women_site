@@ -59,7 +59,7 @@ def show_post(request, post_slug):
 def show_category(request, cat_slug):
     category = get_object_or_404(Category, slug=cat_slug)
     posts = Women.published.filter(cat_id=category.pk)
-    return render(request, 'women/index.html', {'title':'Рубрика: {category.name}',
+    return render(request, 'women/index.html', {'title':f'Рубрика: {category.name}',
                                                  'menu': menu,
                                                  'posts': posts,
                                                  'cat_selected': category.pk})
