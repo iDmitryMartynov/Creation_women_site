@@ -1,6 +1,20 @@
+from typing import Any
 from django.contrib import admin, messages
+from django.db.models import QuerySet
 from .models import Category, Women
 
+class MarriedFilter(admin.SimpleListFilter):
+    title = 'Статус женщин'
+    parameter_name = 'status'
+
+    def lookups(self, request: Any, model_admin: Any) -> list[tuple[Any, str]]:
+        return [('married', 'Замужем'), ('single', 'Не замужем')]
+    
+    def queryset(self, request: Any, queryset: QuerySet[Any]) -> QuerySet[Any] | None:
+        if self.value() == 'married':
+            return queryset.filter(husband__isnull=False)
+        elif self.value() == 'single':
+            return queryset.filter(husband__isnull=True)
 
 @admin.register(Women)
 class WomenAdmin(admin.ModelAdmin):
@@ -10,6 +24,8 @@ class WomenAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     list_per_page = 5
     actions = ['set_published', 'set_draft']
+    search_fields = ['title', 'cat__name']
+    list_filter = [MarriedFilter, 'cat__name', 'is_published']
 
     @admin.display(description='Краткое описание', ordering='content')
     def brief_info(self, women: Women):
