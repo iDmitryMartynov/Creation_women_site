@@ -1,6 +1,8 @@
 from django.http import Http404, HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.views import View
+from django.views.generic import TemplateView
 
 from .forms import AddPostForm, UploadFileForm
 from .models import Category, TagPost, UploadFiles, Women
@@ -21,6 +23,25 @@ def index(request):
                                                  'posts': posts,
                                                  'cat_selected': 0})
 
+
+class WomenHome(TemplateView):
+    template_name = 'women/index.html'
+    extra_context = {
+        'title':'Главная страница',
+        'menu': menu,
+        'posts': Women.published.all().select_related('cat'),
+        'cat_selected': 0
+    }
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['title'] = 'Главная страница'
+    #     context['menu'] = menu
+    #     context['posts'] = Women.published.all().select_related('cat')
+    #     context['cat_selected'] = int(self.request.GET.get('cat_id', 0))
+    #     return context
+
+    
 # def handle_uploaded_file(f):
 #     with open(f"uploads/{f.name}", "wb+") as destination:
 #         for chunk in f.chunks():
@@ -60,6 +81,31 @@ def addpage(request):
     }
     return render(request, 'women/addpage.html', data)
 
+
+class AddPage(View):
+    def get(self, request):
+        form = AddPostForm()
+
+        data = {
+        'title': 'Добавление статьи',
+        'menu': menu,
+        'form': form
+                }
+        return render(request, 'women/addpage.html', data)
+
+
+    def post(self, request):
+        form = AddPostForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+        
+        data = {
+            'title': 'Добавление статьи',
+            'menu': menu,
+            'form': form
+                }
+        return render(request, 'women/addpage.html', data)
 
 def contact(request):
     return HttpResponse('Обратная связь')
