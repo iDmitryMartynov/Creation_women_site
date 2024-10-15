@@ -7,4 +7,5 @@ disable = missing-function-docstring,
         line-too-long,
         invalid-str-returned,
         no-member,
-        bare-except
+        bare-except,
+        unused-import

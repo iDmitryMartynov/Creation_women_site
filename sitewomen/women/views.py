@@ -1,5 +1,5 @@
-from turtle import title
 from typing import Any
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http import Http404, HttpResponse, HttpResponseNotFound
@@ -28,6 +28,7 @@ class WomenHome(DataMixin, ListView):
     title_page = 'Главная страница'
     cat_selected = 0
     
+    
 
     def get_queryset(self) -> QuerySet[Any]:
         return Women.published.all().select_related('cat')
@@ -35,17 +36,14 @@ class WomenHome(DataMixin, ListView):
 
 
 def about(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            fp = UploadFiles(file=form.cleaned_data['file'])
-            fp.save()
-    else:
-        form = UploadFileForm()
+    contact_list = Women.published.all()
+    paginator = Paginator(contact_list, 3)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     return render(request, 'women/about.html',
                    {'title': 'О сайте',
                     'menu': menu,
-                    'form': form})
+                    'page_obj': page_obj})
 
 
 
@@ -103,6 +101,7 @@ class WomenCategory(DataMixin, ListView):
     template_name = 'women/index.html'
     context_object_name = 'posts'
     allow_empty = False
+    
 
     def get_queryset(self) -> QuerySet[Any]:
         return Women.published.filter(cat__slug=self.kwargs['cat_slug']).select_related('cat')
